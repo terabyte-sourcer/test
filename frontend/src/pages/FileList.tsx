@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { getFiles, deleteFile } from '../services/api';
 import type { VisaFile as BaseVisaFile } from '../services/api';
 import FileCard from '../components/FileCard';
+import toast from 'react-hot-toast';
 
 type VisaFile = BaseVisaFile & { preview?: string };
 
 const FileList: React.FC = () => {
   const [groupedFiles, setGroupedFiles] = useState<Record<string, VisaFile[]>>({ passport: [], photos: [], forms: [] });
-    const [loading, setLoading] = useState<boolean>(true);
-    const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -16,11 +16,11 @@ const FileList: React.FC = () => {
         const grouped = await getFiles();
         setGroupedFiles(grouped);
         if (Object.values(grouped).every((arr) => arr.length === 0)) {
-          setMessage('No files uploaded yet.');
+          toast('No files uploaded yet.', { icon: 'ℹ️' });
         }
       } catch (error) {
         setGroupedFiles({ passport: [], photos: [], forms: [] });
-        setMessage('Error fetching files.');
+        toast.error('Error fetching files.');
       } finally {
         setLoading(false);
       }
@@ -31,10 +31,10 @@ const FileList: React.FC = () => {
   const handleDelete = async (fileId: number) => {
     try {
       await deleteFile(fileId);
-      setMessage('File deleted successfully.');
+      toast.success('File deleted successfully.');
       window.location.reload();
     } catch (error) {
-      setMessage('Error deleting file.');
+      toast.error('Error deleting file.');
     }
   };
 
@@ -44,14 +44,14 @@ const FileList: React.FC = () => {
       {loading ? (
         <p className="text-gray-500">Loading files...</p>
       ) : Object.values(groupedFiles).every((arr) => arr.length === 0) ? (
-        <p className="text-gray-400">{message}</p>
+        <p className="text-gray-400">No files uploaded yet.</p>
       ) : (
         <div className="flex gap-8 flex-wrap">
           {['passport', 'photos', 'forms'].map((category) => (
             <div key={category} className='flex-1'>
               <h4 className="text-lg font-semibold capitalize mb-4 text-gray-700">{category}</h4>
               {groupedFiles[category].length === 0 ? (
-                <p className="text-gray-400 mb-4">{message}</p>
+                <p className="text-gray-400 mb-4">No files in this category.</p>
               ) : (
                 groupedFiles[category].map((file, idx) => (
                   <FileCard
