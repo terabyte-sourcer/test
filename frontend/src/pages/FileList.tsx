@@ -1,67 +1,75 @@
 import React, { useEffect, useState } from 'react';
 import { getFiles, deleteFile } from '../services/api';
-import type { VisaFile } from '../services/api';
+import type { VisaFile as BaseVisaFile } from '../services/api';
+import FileCard from '../components/FileCard';
+
+type VisaFile = BaseVisaFile & { preview?: string };
 
 const FileList: React.FC = () => {
-  const [files, setFiles] = useState<Record<string, VisaFile[]>>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchFiles = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const grouped = await getFiles();
-      setFiles(grouped);
-    } catch (e) {
-      setError('Failed to fetch files.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [groupedFiles, setGroupedFiles] = useState<Record<string, VisaFile[]>>({ passport: [], photos: [], forms: [] });
+    const [loading, setLoading] = useState<boolean>(true);
+    const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const grouped = await getFiles();
+        setGroupedFiles(grouped);
+        if (Object.values(grouped).every((arr) => arr.length === 0)) {
+          setMessage('No files uploaded yet.');
+        }
+      } catch (error) {
+        setGroupedFiles({ passport: [], photos: [], forms: [] });
+        setMessage('Error fetching files.');
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchFiles();
   }, []);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (fileId: number) => {
     try {
-      await deleteFile(id);
-      fetchFiles();
-    } catch {
-      alert('Delete failed.');
+      await deleteFile(fileId);
+      setMessage('File deleted successfully.');
+      window.location.reload();
+    } catch (error) {
+      setMessage('Error deleting file.');
     }
   };
 
-  if (loading) return <div>Loading files...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
-
   return (
-    <div className="space-y-8">
-      {Object.entries(files).map(([type, files]) => (
-        <div key={type}>
-          <h3 className="text-lg font-bold mb-2 capitalize">{type}</h3>
-          {files.length === 0 ? (
-            <div className="text-gray-400">No files in this category.</div>
-          ) : (
-            <ul className="space-y-2">
-              {files.map(file => (
-                <li key={file.id} className="flex items-center gap-4 bg-white rounded shadow p-3">
-                  <span className="flex-1 truncate">{file.original_name} <span className="text-xs text-gray-400">({file.type})</span></span>
-                  <button
-                    onClick={() => handleDelete(file.id)}
-                    className="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
-                  >
-                    Delete
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+    <div className="mt-6">
+      <h3 className="text-2xl font-bold text-blue-600 mb-8">Uploaded Files</h3>
+      {loading ? (
+        <p className="text-gray-500">Loading files...</p>
+      ) : Object.values(groupedFiles).every((arr) => arr.length === 0) ? (
+        <p className="text-gray-400">{message}</p>
+      ) : (
+        <div className="flex gap-8 flex-wrap">
+          {['passport', 'photos', 'forms'].map((category) => (
+            <div key={category} className='flex-1'>
+              <h4 className="text-lg font-semibold capitalize mb-4 text-gray-700">{category}</h4>
+              {groupedFiles[category].length === 0 ? (
+                <p className="text-gray-400 mb-4">{message}</p>
+              ) : (
+                groupedFiles[category].map((file, idx) => (
+                  <FileCard
+                    key={file.id}
+                    fileName={file.original_name}
+                    fileType={file.type}
+                    preview={file.preview}
+                    index={idx}
+                    onDelete={() => handleDelete(file.id)}
+                  />
+                ))
+              )}
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 };
 
-export default FileList; 
+export default FileList;
