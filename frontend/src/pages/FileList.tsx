@@ -56,6 +56,7 @@ const FileList: React.FC = () => {
                 groupedFiles[category].map((file, idx) => (
                   <FileCard
                     key={file.id}
+                    url={`http://localhost:8000/storage/${file.filename}`}
                     fileName={file.original_name}
                     fileType={file.type}
                     preview={file.preview}

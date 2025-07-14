@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 
 interface FileCardProps {
   fileName: string;
+  url: string;
   fileType: string;
   preview?: string;
   index: number;
   onDelete?: () => void; // Optional callback for delete
 }
 
-const FileCard: React.FC<FileCardProps> = ({ fileName, fileType, preview, index, onDelete }) => {
+const FileCard: React.FC<FileCardProps> = ({ fileName, url, fileType, preview, index, onDelete }) => {
   const [show, setShow] = useState(false);
   useEffect(() => {
     const timeout = setTimeout(() => setShow(true), 80 * index);
@@ -27,7 +28,7 @@ const FileCard: React.FC<FileCardProps> = ({ fileName, fileType, preview, index,
       style={{ willChange: 'transform, opacity' }}
     >
       <div className="flex flex-col items-center md:items-start w-full md:w-auto flex-1">
-        <span className="font-medium text-gray-800 truncate max-w-xs">{fileName} <span className="text-xs text-gray-400">({fileType})</span></span>
+        <a href={url} className="font-medium text-gray-800 truncate max-w-xs">{fileName} <span className="text-xs text-gray-400">({fileType})</span></a>
         {preview && (fileType.startsWith('image') || fileType === 'application/pdf') && (
           <img src={preview} alt={fileName} className="mt-2 max-h-32 rounded-lg border shadow-sm object-contain bg-gray-50 transition-all duration-300" />
         )}
