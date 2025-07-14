@@ -49,7 +49,7 @@ In php folder, make sure those extensions to
 
 ---
 
-## Frontend Setup (React + Vite + React Router + TailwindCss)
+## Frontend Setup (React + Vite + React Router + TailwindCSS)
 
 1. **Install dependencies:**
    ```sh
