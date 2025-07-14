@@ -1,6 +1,9 @@
 # Visa Dossier File Manager
 
 This project consists of a backend (Laravel) and a frontend (React + Vite + Tailwind) for uploading, listing, and deleting files (PDF, JPG, PNG).
+<img width="1904" height="895" alt="image" src="https://github.com/user-attachments/assets/48bef1c1-57ed-42e4-a62d-4f23b9c286d8" />
+<img width="1897" height="895" alt="image" src="https://github.com/user-attachments/assets/be997a25-2b90-47a0-bacf-0295b7b0af42" />
+<img width="1898" height="894" alt="image" src="https://github.com/user-attachments/assets/92b7089e-9692-466a-8458-e82164cbe918" />
 
 ---
 
@@ -8,7 +11,7 @@ This project consists of a backend (Laravel) and a frontend (React + Vite + Tail
 
 node v22.15.0, npm 10.9.2, php 8.4.10, Composer 2.8.9, Poppler 24.08.0
 
-In php folder
+In php folder, make sure those extensions to
 
     extension=fileinfo
     extension=pdo_sqlite
@@ -34,7 +37,11 @@ In php folder
    ```sh
    php artisan migrate
    ```
-5. **Start the backend server:**
+5. **Connect to Storage:**
+   ```sh
+   php artisan storage:link
+   ```
+6. **Start the backend server:**
    ```sh
    php artisan serve
    ```
@@ -42,7 +49,7 @@ In php folder
 
 ---
 
-## Frontend Setup (React + Vite)
+## Frontend Setup (React + Vite + React Router + TailwindCss)
 
 1. **Install dependencies:**
    ```sh
@@ -57,4 +64,6 @@ In php folder
 
 ---
 
-You can visit localhost:3000 to test upload, get, and delete the files and images.
+You can visit localhost:3000 to test upload, get, and delete the files and images. And can open uploaded files in browser to click the filename.
+
+Note: Please use chrome browser, it hasn't been tested on any other browsers yet.
